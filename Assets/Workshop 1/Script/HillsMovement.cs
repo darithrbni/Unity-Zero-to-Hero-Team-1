@@ -18,15 +18,12 @@ public class HillsMovement : MonoBehaviour
         Vector3 movement = Vector3.back * 20 * Time.deltaTime;
         transform.position += movement;
 
-        if(transform.position.z < camera.transform.position.z)
+        if(transform.position.z < camera.transform.position.z + 10)
         {
             // Tugas, ubah destroy spawn jadi disable enable
             
             // Setactive(false)
-            Destroy(gameObject);
-
-            // Setactive(true)
-            HillsManager.Instance.SpawnHill();
+           transform.position = HillsManager.Instance.spawnPoint.position;
         }
     }
 }

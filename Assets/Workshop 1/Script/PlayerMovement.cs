@@ -1,4 +1,3 @@
-using Unity.Mathematics;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -6,7 +5,9 @@ public class PlayerMovement : MonoBehaviour
     private float moveX;
     private float moveY;
 
-    private Quaternion angle;
+    private float angleX;
+    private float angleY;
+
     [SerializeField] private float smoothTurn;
     [SerializeField] private float moveSpeed;
 
@@ -27,14 +28,17 @@ public class PlayerMovement : MonoBehaviour
         Vector3 movement = new Vector3(moveX, moveY, 0) * moveSpeed * Time.deltaTime;
         transform.position += movement;
 
-        angle.x = Mathf.Lerp(angle.x, moveX * moveSpeed, smoothTurn * Time.deltaTime);
-        angle.y = Mathf.Lerp(angle.y, moveY * moveSpeed, smoothTurn * Time.deltaTime);
+        float clampX = Mathf.Clamp(transform.position.x, -15, 15);
+    float clampY = Mathf.Clamp(transform.position.y, 25, 40);
 
-        angle.x = Mathf.Clamp(angle.x, -55, 55);
-        angle.y = Mathf.Clamp(angle.y, -25, 25);
+        transform.position = new Vector3(clampX, clampY, transform.position.z);
 
-        transform.rotation = Quaternion.Euler(-angle.y, 0, -angle.x);
+       angleX = Mathf.Lerp(angleX, moveX * moveSpeed, smoothTurn * Time.deltaTime);
+        angleY = Mathf.Lerp(angleY, moveY * moveSpeed, smoothTurn * Time.deltaTime);
 
-        Debug.Log(movement);
+        angleX = Mathf.Clamp(angleX, -55, 55);
+        angleY = Mathf.Clamp(angleY, -25, 25);
+
+        transform.rotation = Quaternion.Euler(-angleY, 0, -angleX);
     }
 }

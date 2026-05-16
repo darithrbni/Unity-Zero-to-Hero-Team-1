@@ -1,5 +1,4 @@
-PlayerMovement.cs
-using Unity.Mathematics;
+## PlayerMovement.cs
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -7,7 +6,9 @@ public class PlayerMovement : MonoBehaviour
     private float moveX;
     private float moveY;
 
-    private Quaternion angle;
+    private float angleX;
+    private float angleY;
+
     [SerializeField] private float smoothTurn;
     [SerializeField] private float moveSpeed;
 
@@ -28,21 +29,26 @@ public class PlayerMovement : MonoBehaviour
         Vector3 movement = new Vector3(moveX, moveY, 0) * moveSpeed * Time.deltaTime;
         transform.position += movement;
 
-        angle.x = Mathf.Lerp(angle.x, moveX * moveSpeed, smoothTurn * Time.deltaTime);
-        angle.y = Mathf.Lerp(angle.y, moveY * moveSpeed, smoothTurn * Time.deltaTime);
+        float clampX = Mathf.Clamp(transform.position.x, -15, 15);
+    float clampY = Mathf.Clamp(transform.position.y, 25, 40);
 
-        angle.x = Mathf.Clamp(angle.x, -55, 55);
-        angle.y = Mathf.Clamp(angle.y, -25, 25);
+        transform.position = new Vector3(clampX, clampY, transform.position.z);
 
-        transform.rotation = Quaternion.Euler(-angle.y, 0, -angle.x);
+       angleX = Mathf.Lerp(angleX, moveX * moveSpeed, smoothTurn * Time.deltaTime);
+        angleY = Mathf.Lerp(angleY, moveY * moveSpeed, smoothTurn * Time.deltaTime);
 
-        Debug.Log(movement);
+        angleX = Mathf.Clamp(angleX, -55, 55);
+        angleY = Mathf.Clamp(angleY, -25, 25);
+
+        transform.rotation = Quaternion.Euler(-angleY, 0, -angleX);
     }
 }
 
 
 
-HillsMovement.cs
+
+
+## HillsMovement.cs
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -63,15 +69,12 @@ public class HillsMovement : MonoBehaviour
         Vector3 movement = Vector3.back * 20 * Time.deltaTime;
         transform.position += movement;
 
-        if(transform.position.z < camera.transform.position.z)
+        if(transform.position.z < camera.transform.position.z + 10)
         {
             // Tugas, ubah destroy spawn jadi disable enable
             
             // Setactive(false)
-            Destroy(gameObject);
-
-            // Setactive(true)
-            HillsManager.Instance.SpawnHill();
+           transform.position = HillsManager.Instance.spawnPoint.position;
         }
     }
 }
@@ -79,16 +82,13 @@ public class HillsMovement : MonoBehaviour
 
 
 
-HillsManager.cs
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.PackageManager;
+
+
+## HillsManager.cs
 using UnityEngine;
 
 public class HillsManager : MonoBehaviour
 {
-    public GameObject[] Hills;
-    public float speed = 20;
     public Transform spawnPoint;
 
     public static HillsManager Instance;
@@ -109,10 +109,6 @@ public class HillsManager : MonoBehaviour
     {
         
     }
-
-    public void SpawnHill()
-    {
-        int index = Random.Range(0, Hills.Length);
-        Instantiate(Hills[index], spawnPoint);
-    }
 }
+
+
