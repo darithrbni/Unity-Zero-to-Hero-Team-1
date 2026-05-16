@@ -53,7 +53,10 @@ TemporaryDependencyNodeTargetIdentifier=netstandard2.1
 [sourceFiles]
 Assets/
  TutorialInfo/Scripts/Readme.cs
- Workshop 1/Script/PlayerMovement.cs
+ Workshop 1/Script/
+  HillsManager.cs
+  HillsMovement.cs
+  PlayerMovement.cs
 Temp/obj/Debug/Assembly-CSharp/.NETStandard,Version=v2.1.AssemblyAttributes.cs
 
 [metadataReferences]
