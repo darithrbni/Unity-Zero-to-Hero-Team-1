@@ -1,2 +1,1 @@
-# Genali Course Project Team 1
-
+# Unity Zero to Hero Team 1 Project
