@@ -1,5 +1,61 @@
 # Enemy
+## EnemyBullet.cs
+using UnityEngine;
 
+public class EnemyBullet : MonoBehaviour
+{
+    [SerializeField] private float speed = 30f;
+    [SerializeField] private GameObject hitEffectPrefab;
+
+    private void Start()
+    {
+        Destroy(gameObject, 5f);
+    }
+
+    void Update()
+    {
+        transform.position += Vector3.back * speed * Time.deltaTime;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        PlayerHealth player =
+            collision.gameObject.GetComponent<PlayerHealth>();
+
+        if (player != null)
+        {
+            Instantiate(
+            hitEffectPrefab,
+            transform.position,
+            Quaternion.identity
+        );
+
+        player.TakeDamage();
+
+        Destroy(gameObject);
+        }
+    }
+}
+
+
+## EnemyHealth.cs
+using UnityEngine;
+
+public class EnemyHealth : MonoBehaviour
+{
+    [SerializeField] private GameObject explosionPrefab;
+
+    public void DestroyEnemy()
+    {
+        Instantiate(
+            explosionPrefab,
+            transform.position,
+            Quaternion.identity
+        );
+        ScoreManager.Instance.AddScore(100);
+        Destroy(gameObject);
+    }
+}
 
 
 ## EnemyMovement.cs
@@ -27,6 +83,36 @@ public class EnemyMovement : MonoBehaviour
 }
 
 
+## EnemyShooting.cs
+using System.Collections;
+using UnityEngine;
+
+public class EnemyShooting : MonoBehaviour
+{
+    [SerializeField] private GameObject bulletPrefab;
+
+    [SerializeField] private float shootDelay = 2f;
+
+    private void Start()
+    {
+        StartCoroutine(Shoot());
+    }
+
+    private IEnumerator Shoot()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(shootDelay);
+
+            Instantiate(
+                bulletPrefab,
+                transform.position,
+                Quaternion.Euler(90, 180, 0)
+            );
+        }
+    }
+}
+
 
 ## EnemySpawner.cs
 using System.Collections;
@@ -48,9 +134,13 @@ public class EnemySpawner : MonoBehaviour
 
     [Header("Spawn Settings")]
     [SerializeField] private float spawnDelay = 2f;
+
     [SerializeField] private int maxEnemies = 5;
 
+    [SerializeField] private float minimumDistance = 10f;
+
     private List<GameObject> activeEnemies = new List<GameObject>();
+
     private List<Vector3> reservedTargets = new List<Vector3>();
 
     private void Start()
@@ -64,38 +154,69 @@ public class EnemySpawner : MonoBehaviour
         {
             yield return new WaitForSeconds(spawnDelay);
 
+            // Hapus enemy null
             activeEnemies.RemoveAll(enemy => enemy == null);
 
+            // Batasi jumlah enemy
             if (activeEnemies.Count >= maxEnemies)
+            {
                 continue;
+            }
 
-            Transform randomSpawn = spawnPoints[
-                Random.Range(0, spawnPoints.Length)
-            ];
+            // Refresh target reservation
+            reservedTargets.Clear();
+
+            foreach (GameObject activeEnemy in activeEnemies)
+            {
+                reservedTargets.Add(
+                    activeEnemy.transform.position
+                );
+            }
+
+            // Pilih spawn point random
+            Transform randomSpawn =
+                spawnPoints[
+                    Random.Range(0, spawnPoints.Length)
+                ];
 
             Vector3 targetPos = Vector3.zero;
 
             bool validTarget = false;
 
-            while (!validTarget)
+            int attempts = 0;
+
+            // Cari target yang valid
+            while (!validTarget && attempts < 50)
             {
-                targetPos = combatAreaCenter.position + new Vector3(
-                    Random.Range(
-                        -combatAreaSize.x / 2,
-                        combatAreaSize.x / 2
-                    ),
-                    Random.Range(
-                        -combatAreaSize.y / 2,
-                        combatAreaSize.y / 2
-                    ),
-                    0
-                );
+                attempts++;
+
+                targetPos =
+                    combatAreaCenter.position +
+                    new Vector3(
+                        Random.Range(
+                            -combatAreaSize.x / 2,
+                            combatAreaSize.x / 2
+                        ),
+
+                        Random.Range(
+                            -combatAreaSize.y / 2,
+                            combatAreaSize.y / 2
+                        ),
+
+                        0
+                    );
 
                 validTarget = true;
 
                 foreach (Vector3 reserved in reservedTargets)
                 {
-                    if (Vector3.Distance(targetPos, reserved) < 20f)
+                    float distance =
+                        Vector3.Distance(
+                            targetPos,
+                            reserved
+                        );
+
+                    if (distance < minimumDistance)
                     {
                         validTarget = false;
                         break;
@@ -103,20 +224,34 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
 
+            // Kalau gagal cari posisi
+            if (!validTarget)
+            {
+                Debug.LogWarning(
+                    "Gagal menemukan target enemy."
+                );
+
+                continue;
+            }
+
+            // Simpan target
             reservedTargets.Add(targetPos);
 
-            GameObject enemy = Instantiate(
+            // Spawn enemy
+            GameObject newEnemy = Instantiate(
                 enemyPrefab,
                 randomSpawn.position,
                 Quaternion.Euler(0, 180, 0)
             );
 
+            // Kasih target ke enemy
             EnemyMovement movement =
-                enemy.GetComponent<EnemyMovement>();
+                newEnemy.GetComponent<EnemyMovement>();
 
             movement.SetTarget(targetPos);
 
-            activeEnemies.Add(enemy);
+            // Simpan enemy aktif
+            activeEnemies.Add(newEnemy);
         }
     }
 }
@@ -174,11 +309,12 @@ public class HillsMovement : MonoBehaviour
 
 
 
+
 # Player
-## Bullet.cs
+## PlayerBullet.cs
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class PlayerBullet : MonoBehaviour
 {
     [SerializeField] private float speed = 30f;
 
@@ -194,17 +330,57 @@ public class Bullet : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        EnemyMovement enemy = collision.gameObject.GetComponent<EnemyMovement>();
+        EnemyHealth enemy = collision.gameObject.GetComponent<EnemyHealth>();
 
         if (enemy != null)
         {
-            Destroy(collision.gameObject);
+        enemy.DestroyEnemy();
+
+        Destroy(gameObject);
+        }
+    }
+}
+
+
+
+## PlayerHealth.cs
+using UnityEngine;
+
+public class PlayerHealth : MonoBehaviour
+{
+    [SerializeField] private int health = 3;
+    [SerializeField] private HealthUI healthUI;
+
+    [SerializeField] private GameObject explosionPrefab;
+
+    private void Start()
+    {
+        healthUI.UpdateHealth(health);
+    }
+
+    public void TakeDamage()
+    {
+        health--;
+        healthUI.UpdateHealth(health);
+
+        Debug.Log("Player HP: " + health);
+
+        if (health <= 0)
+        {
+            Debug.Log("PLAYER MATI");
+
+            Instantiate(
+            explosionPrefab,
+            transform.position,
+            Quaternion.identity
+        );
+
+            GameOverManager.Instance.GameOver();
 
             Destroy(gameObject);
         }
     }
 }
-
 
 
 ## PlayerMovement.cs
@@ -239,7 +415,7 @@ public class PlayerMovement : MonoBehaviour
         transform.position += movement;
 
         float clampX = Mathf.Clamp(transform.position.x, -15, 15);
-    float clampY = Mathf.Clamp(transform.position.y, 25, 40);
+    float clampY = Mathf.Clamp(transform.position.y, 20, 45);
 
         transform.position = new Vector3(clampX, clampY, transform.position.z);
 
@@ -252,6 +428,7 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(-angleY, 0, -angleX);
     }
 }
+
 
 
 
@@ -277,5 +454,95 @@ public class PlayerShooting : MonoBehaviour
         {
             Instantiate(bullet, transform.position, Quaternion.Euler(90, 0, 0));
         }
+    }
+}
+
+
+
+
+# Managers
+## GameOverManager.cs
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class GameOverManager : MonoBehaviour
+{
+    public static GameOverManager Instance;
+
+    [SerializeField]
+    private GameObject gameOverScreen;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    public void GameOver()
+    {
+        gameOverScreen.SetActive(true);
+    }
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().buildIndex
+        );
+    }
+}
+
+
+
+## HealthUI.cs
+using UnityEngine;
+using UnityEngine.UI;
+
+public class HealthUI : MonoBehaviour
+{
+    [SerializeField] private Image[] hearts;
+
+    [SerializeField] private Sprite fullHeart;
+
+    [SerializeField] private Sprite emptyHeart;
+
+    public void UpdateHealth(int currentHealth)
+    {
+        for (int i = 0; i < hearts.Length; i++)
+        {
+            if (i < currentHealth)
+            {
+                hearts[i].sprite = fullHeart;
+            }
+            else
+            {
+                hearts[i].sprite = emptyHeart;
+            }
+        }
+    }
+}
+
+
+
+## ScoreManager.cs
+using TMPro;
+using UnityEngine;
+
+public class ScoreManager : MonoBehaviour
+{
+    public static ScoreManager Instance;
+
+    [SerializeField] private TextMeshProUGUI scoreText;
+
+    private int score = 0;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    public void AddScore(int amount)
+    {
+        score += amount;
+
+        scoreText.text = "Score : " + score;
     }
 }
