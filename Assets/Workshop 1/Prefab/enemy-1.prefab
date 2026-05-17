@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3788101034105374231}
   - component: {fileID: 579586794220959954}
   - component: {fileID: 9148058529599310772}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Particle System (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4852,7 +4852,8 @@ GameObject:
   - component: {fileID: 8890491951041818512}
   - component: {fileID: 4589452210099651223}
   - component: {fileID: 4733235515129711222}
-  m_Layer: 0
+  - component: {fileID: 1378345293587693324}
+  m_Layer: 7
   m_Name: enemy-1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4950,6 +4951,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explosionPrefab: {fileID: 1579715810955201039, guid: a4f0c2c1c1bb1e64c999c3d875717269,
     type: 3}
+--- !u!114 &1378345293587693324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6588526787404770086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70c1bb65cbdb8a14e9c2953f52e07cb6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPrefab: {fileID: 8297191405790434548, guid: 02f0535fe28612844b7218d384831d35,
+    type: 3}
+  shootDelay: 2
 --- !u!1 &7599082272721850881
 GameObject:
   m_ObjectHideFlags: 0
@@ -4961,7 +4977,7 @@ GameObject:
   - component: {fileID: 835599334643045748}
   - component: {fileID: 2931219693712837129}
   - component: {fileID: 3755247387291040344}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: aircraft-i_003 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5047,6 +5063,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Particle System
+      objectReference: {fileID: 0}
+    - target: {fileID: 1451484317306073886, guid: 1e1e7d2e5f30c00459ef49534bba50cc,
+        type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 1451484317306073887, guid: 1e1e7d2e5f30c00459ef49534bba50cc,
         type: 3}

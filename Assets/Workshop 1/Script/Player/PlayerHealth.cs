@@ -1,18 +1,18 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private int health = 3;
 
-    // Update is called once per frame
-    void Update()
+    public void TakeDamage()
     {
-        
+        health--;
+
+        Debug.Log("Player HP: " + health);
+
+        if (health <= 0)
+        {
+            Debug.Log("PLAYER MATI");
+        }
     }
 }

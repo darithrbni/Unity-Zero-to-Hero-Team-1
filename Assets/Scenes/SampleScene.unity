@@ -931,7 +931,7 @@ GameObject:
   m_Component:
   - component: {fileID: 799036239}
   - component: {fileID: 799036240}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: BulletSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1279,6 +1279,19 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1792170485}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1416978094
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1416978087}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abb6393bb0de99640845a3dd77095d8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  health: 3
 --- !u!1001 &1511114061
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1709,6 +1722,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 5050531998232240615, guid: 7acac99340da2f143ac29b8b4fd6ccd9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5050531998338222957, guid: 7acac99340da2f143ac29b8b4fd6ccd9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5050531998404469737, guid: 7acac99340da2f143ac29b8b4fd6ccd9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 5392622699900519203, guid: 7acac99340da2f143ac29b8b4fd6ccd9,
+        type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -1721,6 +1754,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1416978088}
+    - targetCorrespondingSourceObject: {fileID: 5050531998232240615, guid: 7acac99340da2f143ac29b8b4fd6ccd9,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1416978094}
   m_SourcePrefab: {fileID: 100100000, guid: 7acac99340da2f143ac29b8b4fd6ccd9, type: 3}
 --- !u!1 &1902736189
 GameObject:

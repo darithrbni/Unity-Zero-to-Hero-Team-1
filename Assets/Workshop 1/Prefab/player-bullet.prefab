@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4344475272828396089}
   - component: {fileID: -4697747104017595554}
   - component: {fileID: 8728738752023307504}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: player-bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -150,8 +150,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 30
-  explosionPrefab: {fileID: 1579715810955201039, guid: a4f0c2c1c1bb1e64c999c3d875717269,
-    type: 3}
 --- !u!1 &8660081015896966768
 GameObject:
   m_ObjectHideFlags: 0
@@ -163,7 +161,7 @@ GameObject:
   - component: {fileID: 1697008115292604623}
   - component: {fileID: 5338543728189753608}
   - component: {fileID: 1765538717943871795}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FireEffect
   m_TagString: Untagged
   m_Icon: {fileID: 0}
