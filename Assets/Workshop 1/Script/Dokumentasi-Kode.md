@@ -85,12 +85,14 @@ public class HillsMovement : MonoBehaviour
 
 
 ## HillsManager.cs
+using System.Collections;
 using UnityEngine;
 
 public class HillsManager : MonoBehaviour
 {
-    public Transform spawnPoint;
+    public GameObject[] Enemies;
 
+    public Transform spawnPoint;
     public static HillsManager Instance;
 
     void Awake()
@@ -101,7 +103,7 @@ public class HillsManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        StartCoroutine(SpawnEnemies());
     }
 
     // Update is called once per frame
@@ -109,6 +111,109 @@ public class HillsManager : MonoBehaviour
     {
         
     }
+
+    private IEnumerator SpawnEnemies()
+    {
+        yield return new WaitForSeconds(3f);
+        foreach(GameObject Enemy in Enemies)
+        {
+            Enemy.SetActive(true);
+            // Tugas, kalau enemy sudah habis di array, panggil lagi SpawnEnemies()
+        }
+    }
 }
 
 
+
+## EnemyMovement.cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyMovement : MonoBehaviour
+{
+    [SerializeField] private Transform targetPos;
+    private Vector3 resultPos;
+    
+    private void OnEnable()
+    {
+        Vector3 offset = new Vector3(Random.Range(-20f, 20f), Random.Range(-5f, 15f), 0);
+        resultPos = transform.localPosition + offset;
+    }
+
+    private void OnDisable()
+    {
+        transform.localPosition = Vector3.zero;
+    }
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.localPosition = Vector3.Lerp(transform.localPosition, resultPos, 3f * Time.deltaTime);
+    }
+}
+
+
+
+
+## PlayerShooting.cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerShooting : MonoBehaviour
+{
+    [SerializeField] private GameObject bullet;
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Instantiate(bullet, transform.position, Quaternion.Euler(90, 0, 0));
+        }
+    }
+}
+
+
+
+
+## Bullet.cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Bullet : MonoBehaviour
+{
+    [SerializeField] private float speed = 10f;
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.position += Vector3.forward * 10f * Time.deltaTime;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        EnemyMovement enemy = collision.gameObject.GetComponent<EnemyMovement>();
+        if(collision != null)
+        {
+            collision.gameObject.SetActive(false);
+        }
+    }
+}
