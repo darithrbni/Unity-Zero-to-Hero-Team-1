@@ -5,8 +5,6 @@ public class EnemyShooting : MonoBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
 
-    [SerializeField] private float shootDelay = 2f;
-
     private void Start()
     {
         StartCoroutine(Shoot());
@@ -16,7 +14,9 @@ public class EnemyShooting : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(shootDelay);
+            yield return new WaitForSeconds(
+                Random.Range(1f, 3f)
+            );
 
             Instantiate(
                 bulletPrefab,
