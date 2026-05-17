@@ -14,7 +14,7 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -29,11 +29,11 @@ public class PlayerMovement : MonoBehaviour
         transform.position += movement;
 
         float clampX = Mathf.Clamp(transform.position.x, -15, 15);
-    float clampY = Mathf.Clamp(transform.position.y, 20, 45);
+        float clampY = Mathf.Clamp(transform.position.y, 20, 45);
 
         transform.position = new Vector3(clampX, clampY, transform.position.z);
 
-       angleX = Mathf.Lerp(angleX, moveX * moveSpeed, smoothTurn * Time.deltaTime);
+        angleX = Mathf.Lerp(angleX, moveX * moveSpeed, smoothTurn * Time.deltaTime);
         angleY = Mathf.Lerp(angleY, moveY * moveSpeed, smoothTurn * Time.deltaTime);
 
         angleX = Mathf.Clamp(angleX, -55, 55);

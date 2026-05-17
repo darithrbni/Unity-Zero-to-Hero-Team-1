@@ -9,7 +9,10 @@ public class PlayerHealth : MonoBehaviour
 
     private void Start()
     {
-        healthUI.UpdateHealth(health);
+        healthUI.UpdateHealth(
+    health,
+    false
+);
     }
 
     public void TakeDamage()
