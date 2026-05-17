@@ -11,7 +11,7 @@ public class EnemyHealth : MonoBehaviour
             transform.position,
             Quaternion.identity
         );
-
+        ScoreManager.Instance.AddScore(100);
         Destroy(gameObject);
     }
 }
