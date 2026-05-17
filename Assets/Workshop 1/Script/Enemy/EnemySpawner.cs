@@ -35,7 +35,7 @@ public class EnemySpawner : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(
-                Random.Range(1f, 5f)
+                Random.Range(2f, 4f)
             );
 
             // Hapus enemy null

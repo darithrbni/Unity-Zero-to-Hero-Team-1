@@ -131,6 +131,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 64643793}
+  - component: {fileID: 64643794}
   m_Layer: 5
   m_Name: GameOver
   m_TagString: Untagged
@@ -160,6 +161,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &64643794
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 64643792}
+  m_Enabled: 1
+  m_Alpha: 0
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &92260606
 GameObject:
   m_ObjectHideFlags: 0
@@ -2661,7 +2674,7 @@ PrefabInstance:
     - target: {fileID: 5050531998232240612, guid: 7acac99340da2f143ac29b8b4fd6ccd9,
         type: 3}
       propertyPath: m_Radius
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5050531998232240612, guid: 7acac99340da2f143ac29b8b4fd6ccd9,
         type: 3}
@@ -3193,7 +3206,6 @@ MonoBehaviour:
   - {fileID: 1960236779}
   combatAreaCenter: {fileID: 784777863}
   combatAreaSize: {x: 30, y: 20}
-  spawnDelay: 2
   maxEnemies: 5
   minimumDistance: 10
 --- !u!1 &2132034826
@@ -3227,6 +3239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameOverScreen: {fileID: 64643792}
+  gameOverCanvas: {fileID: 64643794}
 --- !u!114 &2132034828
 MonoBehaviour:
   m_ObjectHideFlags: 0
