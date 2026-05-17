@@ -29,7 +29,7 @@ public class PlayerMovement : MonoBehaviour
         transform.position += movement;
 
         float clampX = Mathf.Clamp(transform.position.x, -15, 15);
-    float clampY = Mathf.Clamp(transform.position.y, 25, 40);
+    float clampY = Mathf.Clamp(transform.position.y, 20, 45);
 
         transform.position = new Vector3(clampX, clampY, transform.position.z);
 
