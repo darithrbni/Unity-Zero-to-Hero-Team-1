@@ -29,6 +29,8 @@ public class PlayerHealth : MonoBehaviour
             Quaternion.identity
         );
 
+            GameOverManager.Instance.GameOver();
+
             Destroy(gameObject);
         }
     }
