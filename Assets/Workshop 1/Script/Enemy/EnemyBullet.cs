@@ -3,6 +3,7 @@ using UnityEngine;
 public class EnemyBullet : MonoBehaviour
 {
     [SerializeField] private float speed = 30f;
+    [SerializeField] private GameObject hitEffectPrefab;
 
     private void Start()
     {
@@ -21,9 +22,15 @@ public class EnemyBullet : MonoBehaviour
 
         if (player != null)
         {
-            player.TakeDamage();
+            Instantiate(
+            hitEffectPrefab,
+            transform.position,
+            Quaternion.identity
+        );
 
-            Destroy(gameObject);
+        player.TakeDamage();
+
+        Destroy(gameObject);
         }
     }
 }
