@@ -12,6 +12,9 @@ public class PlayerHealth : MonoBehaviour
     private Renderer[] playerRenderers;
 
     [SerializeField]
+    private PickupFlash pickupFlash;
+
+    [SerializeField]
     private float invincibleDuration = 3f;
 
     private bool isInvincible = false;
@@ -55,6 +58,8 @@ public class PlayerHealth : MonoBehaviour
 
     public void Heal(int amount)
     {
+        pickupFlash.Flash();
+
         if (health >= 3)
         {
             return;
