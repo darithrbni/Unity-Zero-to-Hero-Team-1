@@ -47,6 +47,12 @@ public class EnemyHealth : MonoBehaviour
 {
     [SerializeField] private GameObject explosionPrefab;
 
+    [SerializeField] private GameObject heartPickupPrefab;
+
+    [SerializeField]
+    [Range(0f, 1f)]
+    private float heartDropChance = 0.1f;
+
     public void DestroyEnemy()
     {
         Instantiate(
@@ -54,6 +60,17 @@ public class EnemyHealth : MonoBehaviour
             transform.position,
             Quaternion.identity
         );
+
+        // Chance drop heart
+        if (Random.value <= heartDropChance)
+        {
+            Instantiate(
+                heartPickupPrefab,
+                transform.position,
+                Quaternion.identity
+            );
+        }
+
         ScoreManager.Instance.AddScore(100);
         Destroy(gameObject);
     }
@@ -573,7 +590,24 @@ public class PlayerHealth : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    public void Heal(int amount)
+    {
+        if (health >= 3)
+        {
+            return;
+        }
+
+        health += amount;
+
+        health = Mathf.Clamp(health, 0, 3);
+
+        healthUI.UpdateHealth(health);
+
+        Debug.Log("Player Heal: " + health);
+    }
 }
+
 
 
 
@@ -813,5 +847,63 @@ public class ScoreManager : MonoBehaviour
         score += amount;
 
         scoreText.text = "Score : " + score;
+    }
+}
+
+
+
+# PowerUp
+## HeartPickup.cs
+using UnityEngine;
+
+public class HeartPickup : MonoBehaviour
+{
+    [SerializeField] private float moveSpeed = 20f;
+
+    [SerializeField] private float rotateSpeed = 100f;
+
+    private Camera mainCamera;
+
+    private void Start()
+    {
+        mainCamera = Camera.main;
+    }
+
+    void Update()
+    {
+        // Bergerak ke belakang
+        transform.position +=
+            Vector3.back *
+            moveSpeed *
+            Time.deltaTime;
+
+        // Muter
+        transform.Rotate(
+            0,
+            rotateSpeed * Time.deltaTime,
+            0
+        );
+
+        // Hapus kalau sudah lewat kamera
+        if (
+            transform.position.z <
+            mainCamera.transform.position.z - 10f
+        )
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        PlayerHealth player =
+            other.GetComponent<PlayerHealth>();
+
+        if (player != null)
+        {
+            player.Heal(1);
+
+            Destroy(gameObject);
+        }
     }
 }

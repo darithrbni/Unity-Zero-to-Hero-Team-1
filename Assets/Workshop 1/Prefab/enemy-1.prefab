@@ -4955,7 +4955,7 @@ MonoBehaviour:
     type: 3}
   heartPickupPrefab: {fileID: 3458163815169714621, guid: da0bb20b3bbfc094fa4ecf09107231a0,
     type: 3}
-  heartDropChance: 1
+  heartDropChance: 0.25
 --- !u!114 &1378345293587693324
 MonoBehaviour:
   m_ObjectHideFlags: 0
