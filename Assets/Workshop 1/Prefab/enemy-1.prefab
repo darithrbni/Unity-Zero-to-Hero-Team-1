@@ -4910,6 +4910,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   moveSpeed: 20
+  patrolRadius: 6
+  patrolSpeed: 2
 --- !u!54 &4589452210099651223
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -4951,6 +4953,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explosionPrefab: {fileID: 1579715810955201039, guid: a4f0c2c1c1bb1e64c999c3d875717269,
     type: 3}
+  heartPickupPrefab: {fileID: 3458163815169714621, guid: da0bb20b3bbfc094fa4ecf09107231a0,
+    type: 3}
+  heartDropChance: 1
 --- !u!114 &1378345293587693324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4965,7 +4970,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 8297191405790434548, guid: 02f0535fe28612844b7218d384831d35,
     type: 3}
-  shootDelay: 2
 --- !u!1 &7599082272721850881
 GameObject:
   m_ObjectHideFlags: 0

@@ -38,6 +38,8 @@ public class EnemyBullet : MonoBehaviour
 }
 
 
+
+
 ## EnemyHealth.cs
 using UnityEngine;
 
@@ -58,7 +60,11 @@ public class EnemyHealth : MonoBehaviour
 }
 
 
+
+
 ## EnemyMovement.cs
+using System.Collections;
+
 using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
@@ -67,20 +73,177 @@ public class EnemyMovement : MonoBehaviour
 
     private Vector3 targetPosition;
 
+    private Vector3 previousPosition;
+
+    private float angleX;
+    private float angleY;
+
+    private bool reachedTarget = false;
+
+    private Vector3 patrolCenter;
+
+    private Vector3 patrolDirection;
+
+    [SerializeField]
+    private float patrolRadius = 6f;
+
+    [SerializeField]
+    private float patrolSpeed = 2f;
+
     public void SetTarget(Vector3 target)
     {
         targetPosition = target;
+
+        patrolCenter = target;
+
+        previousPosition = transform.position;
     }
 
+    private float currentTiltX;
+
+    private float currentTiltY;
+
     void Update()
-{
-    transform.position = Vector3.Lerp(
-        transform.position,
-        targetPosition,
-        2f * Time.deltaTime
-    );
+    {
+        Vector3 oldPosition = transform.position;
+
+        // Masuk arena
+        if (!reachedTarget)
+        {
+            transform.position = Vector3.Lerp(
+                transform.position,
+                targetPosition,
+                2f * Time.deltaTime
+            );
+
+            if (
+                Vector3.Distance(
+                    transform.position,
+                    targetPosition
+                ) < 1f
+            )
+            {
+                reachedTarget = true;
+
+                ChooseNewDirection();
+
+                StartCoroutine(RandomMovement());
+            }
+        }
+
+        // Patrol
+        else
+        {
+            transform.position = Vector3.MoveTowards(
+                transform.position,
+                targetPosition,
+                2f * Time.deltaTime
+            );
+        }
+
+        // HITUNG ARAH GERAK
+        Vector3 moveDirection =
+            transform.position - oldPosition;
+
+        float moveX = moveDirection.x;
+
+        float moveY = moveDirection.y;
+
+        // ROTASI PESAWAT
+        float targetTiltX = Mathf.Clamp(
+            moveX * 300f,
+            -30f,
+            30f
+        );
+
+        float targetTiltY = Mathf.Clamp(
+            moveY * 300f,
+            -45f,
+            45f
+        );
+
+        currentTiltX = Mathf.Lerp(
+            currentTiltX,
+            targetTiltX,
+            5f * Time.deltaTime
+        );
+
+        currentTiltY = Mathf.Lerp(
+            currentTiltY,
+            targetTiltY,
+            5f * Time.deltaTime
+        );
+
+        transform.rotation = Quaternion.Euler(
+            -currentTiltY,
+            180,
+            currentTiltX
+        );
+    }
+
+    private void ChooseNewDirection()
+    {
+        patrolDirection = new Vector3(
+            Random.Range(-1f, 1f),
+            Random.Range(-1f, 1f),
+            0
+        ).normalized;
+    }
+
+    private IEnumerator RandomMovement()
+    {
+        while (true)
+        {
+            Vector3 nextPosition =
+                transform.position +
+                patrolDirection * patrolSpeed;
+
+            float distanceFromCenter =
+                Vector3.Distance(
+                    nextPosition,
+                    patrolCenter
+                );
+
+            // Kalau hampir keluar radius
+            if (distanceFromCenter > patrolRadius)
+            {
+                ChooseNewDirection();
+            }
+
+            targetPosition =
+            transform.position +
+            patrolDirection * 3f;
+
+            float clampX = Mathf.Clamp(
+                targetPosition.x,
+                -15f,
+                15f
+            );
+
+            float clampY = Mathf.Clamp(
+                targetPosition.y,
+                25f,
+                45f
+            );
+
+            targetPosition = new Vector3(
+                clampX,
+                clampY,
+                targetPosition.z
+            );
+
+            // Kadang random ganti arah
+            if (Random.value > 0.7f)
+            {
+                ChooseNewDirection();
+            }
+
+            yield return new WaitForSeconds(1f);
+        }
+    }
 }
-}
+
+
 
 
 ## EnemyShooting.cs
@@ -91,8 +254,6 @@ public class EnemyShooting : MonoBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
 
-    [SerializeField] private float shootDelay = 2f;
-
     private void Start()
     {
         StartCoroutine(Shoot());
@@ -102,7 +263,9 @@ public class EnemyShooting : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(shootDelay);
+            yield return new WaitForSeconds(
+                Random.Range(1f, 3f)
+            );
 
             Instantiate(
                 bulletPrefab,
@@ -112,6 +275,7 @@ public class EnemyShooting : MonoBehaviour
         }
     }
 }
+
 
 
 ## EnemySpawner.cs
@@ -133,7 +297,6 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] private Vector2 combatAreaSize = new Vector2(30, 20);
 
     [Header("Spawn Settings")]
-    [SerializeField] private float spawnDelay = 2f;
 
     [SerializeField] private int maxEnemies = 5;
 
@@ -152,7 +315,9 @@ public class EnemySpawner : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(spawnDelay);
+            yield return new WaitForSeconds(
+                Random.Range(3f, 5f)
+            );
 
             // Hapus enemy null
             activeEnemies.RemoveAll(enemy => enemy == null);
@@ -174,87 +339,111 @@ public class EnemySpawner : MonoBehaviour
             }
 
             // Pilih spawn point random
-            Transform randomSpawn =
-                spawnPoints[
-                    Random.Range(0, spawnPoints.Length)
-                ];
+            int enemyCount = Random.Range(1, 4);
 
-            Vector3 targetPos = Vector3.zero;
-
-            bool validTarget = false;
-
-            int attempts = 0;
-
-            // Cari target yang valid
-            while (!validTarget && attempts < 50)
-            {
-                attempts++;
-
-                targetPos =
-                    combatAreaCenter.position +
-                    new Vector3(
-                        Random.Range(
-                            -combatAreaSize.x / 2,
-                            combatAreaSize.x / 2
-                        ),
-
-                        Random.Range(
-                            -combatAreaSize.y / 2,
-                            combatAreaSize.y / 2
-                        ),
-
-                        0
-                    );
-
-                validTarget = true;
-
-                foreach (Vector3 reserved in reservedTargets)
-                {
-                    float distance =
-                        Vector3.Distance(
-                            targetPos,
-                            reserved
-                        );
-
-                    if (distance < minimumDistance)
-                    {
-                        validTarget = false;
-                        break;
-                    }
-                }
-            }
-
-            // Kalau gagal cari posisi
-            if (!validTarget)
-            {
-                Debug.LogWarning(
-                    "Gagal menemukan target enemy."
-                );
-
-                continue;
-            }
-
-            // Simpan target
-            reservedTargets.Add(targetPos);
-
-            // Spawn enemy
-            GameObject newEnemy = Instantiate(
-                enemyPrefab,
-                randomSpawn.position,
-                Quaternion.Euler(0, 180, 0)
+            enemyCount = Mathf.Min(
+                enemyCount,
+                maxEnemies - activeEnemies.Count
             );
 
-            // Kasih target ke enemy
-            EnemyMovement movement =
-                newEnemy.GetComponent<EnemyMovement>();
+            List<int> usedSpawnIndexes =
+            new List<int>();
 
-            movement.SetTarget(targetPos);
+            for (int i = 0; i < enemyCount; i++)
+            {
+                int randomIndex;
 
-            // Simpan enemy aktif
-            activeEnemies.Add(newEnemy);
+                do
+                {
+                    randomIndex =
+                        Random.Range(0, spawnPoints.Length);
+                }
+                while (usedSpawnIndexes.Contains(randomIndex));
+
+                usedSpawnIndexes.Add(randomIndex);
+
+                Transform randomSpawn =
+                    spawnPoints[randomIndex];
+
+                Vector3 targetPos = Vector3.zero;
+
+                bool validTarget = false;
+
+                int attempts = 0;
+
+                // Cari target yang valid
+                while (!validTarget && attempts < 50)
+                {
+                    attempts++;
+
+                    targetPos =
+                        combatAreaCenter.position +
+                        new Vector3(
+                            Random.Range(
+                                -combatAreaSize.x / 2,
+                                combatAreaSize.x / 2
+                            ),
+
+                            Random.Range(
+                                -combatAreaSize.y / 2,
+                                combatAreaSize.y / 2
+                            ),
+
+                            0
+                        );
+
+                    validTarget = true;
+
+                    foreach (Vector3 reserved in reservedTargets)
+                    {
+                        float distance =
+                            Vector3.Distance(
+                                targetPos,
+                                reserved
+                            );
+
+                        if (distance < minimumDistance)
+                        {
+                            validTarget = false;
+                            break;
+                        }
+                    }
+                }
+
+                // Kalau gagal cari posisi
+                if (!validTarget)
+                {
+                    Debug.LogWarning(
+                        "Gagal menemukan target enemy."
+                    );
+
+                    continue;
+                }
+
+                // Simpan target
+                reservedTargets.Add(targetPos);
+
+                // Spawn enemy
+                GameObject newEnemy = Instantiate(
+                    enemyPrefab,
+                    randomSpawn.position,
+                    Quaternion.Euler(0, 180, 0)
+                );
+
+                // Kasih target ke enemy
+                EnemyMovement movement =
+                    newEnemy.GetComponent<EnemyMovement>();
+
+                movement.SetTarget(targetPos);
+
+                // Simpan enemy aktif
+                activeEnemies.Add(newEnemy);
+            }
         }
     }
 }
+
+
 
 
 
@@ -310,6 +499,7 @@ public class HillsMovement : MonoBehaviour
 
 
 
+
 # Player
 ## PlayerBullet.cs
 using UnityEngine;
@@ -334,9 +524,9 @@ public class PlayerBullet : MonoBehaviour
 
         if (enemy != null)
         {
-        enemy.DestroyEnemy();
+enemy.DestroyEnemy();
 
-        Destroy(gameObject);
+Destroy(gameObject);
         }
     }
 }
@@ -355,7 +545,10 @@ public class PlayerHealth : MonoBehaviour
 
     private void Start()
     {
-        healthUI.UpdateHealth(health);
+        healthUI.UpdateHealth(
+    health,
+    false
+);
     }
 
     public void TakeDamage()
@@ -383,6 +576,7 @@ public class PlayerHealth : MonoBehaviour
 }
 
 
+
 ## PlayerMovement.cs
 using UnityEngine;
 
@@ -400,7 +594,7 @@ public class PlayerMovement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -415,11 +609,11 @@ public class PlayerMovement : MonoBehaviour
         transform.position += movement;
 
         float clampX = Mathf.Clamp(transform.position.x, -15, 15);
-    float clampY = Mathf.Clamp(transform.position.y, 20, 45);
+        float clampY = Mathf.Clamp(transform.position.y, 20, 45);
 
         transform.position = new Vector3(clampX, clampY, transform.position.z);
 
-       angleX = Mathf.Lerp(angleX, moveX * moveSpeed, smoothTurn * Time.deltaTime);
+        angleX = Mathf.Lerp(angleX, moveX * moveSpeed, smoothTurn * Time.deltaTime);
         angleY = Mathf.Lerp(angleY, moveY * moveSpeed, smoothTurn * Time.deltaTime);
 
         angleX = Mathf.Clamp(angleX, -55, 55);
@@ -428,7 +622,6 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(-angleY, 0, -angleX);
     }
 }
-
 
 
 
@@ -462,6 +655,7 @@ public class PlayerShooting : MonoBehaviour
 
 # Managers
 ## GameOverManager.cs
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -472,6 +666,9 @@ public class GameOverManager : MonoBehaviour
     [SerializeField]
     private GameObject gameOverScreen;
 
+    [SerializeField]
+    private CanvasGroup gameOverCanvas;
+
     private void Awake()
     {
         Instance = this;
@@ -480,6 +677,8 @@ public class GameOverManager : MonoBehaviour
     public void GameOver()
     {
         gameOverScreen.SetActive(true);
+
+        StartCoroutine(FadeGameOver());
     }
 
     public void RestartGame()
@@ -488,11 +687,37 @@ public class GameOverManager : MonoBehaviour
             SceneManager.GetActiveScene().buildIndex
         );
     }
+    private IEnumerator FadeGameOver()
+    {
+        float duration = 1f;
+
+        float time = 0;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+
+            gameOverCanvas.alpha =
+                Mathf.Lerp(
+                    0,
+                    1,
+                    time / duration
+                );
+
+            yield return null;
+        }
+
+        gameOverCanvas.alpha = 1;
+    }
+
 }
 
 
 
+
+
 ## HealthUI.cs
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -504,7 +729,18 @@ public class HealthUI : MonoBehaviour
 
     [SerializeField] private Sprite emptyHeart;
 
-    public void UpdateHealth(int currentHealth)
+    private Vector3 originalPosition;
+
+    private void Start()
+    {
+        originalPosition =
+            transform.localPosition;
+    }
+
+    public void UpdateHealth(
+    int currentHealth,
+    bool playShake = true
+)
     {
         for (int i = 0; i < hearts.Length; i++)
         {
@@ -517,6 +753,39 @@ public class HealthUI : MonoBehaviour
                 hearts[i].sprite = emptyHeart;
             }
         }
+        if (playShake)
+        {
+            StartCoroutine(ShakeHearts());
+        }
+    }
+
+    private IEnumerator ShakeHearts()
+    {
+        float duration = 0.3f;
+
+        float strength = 4f;
+
+        float time = 0;
+
+        while (time < duration)
+        {
+            time += Time.deltaTime;
+
+            Vector3 randomOffset =
+                new Vector3(
+                    Random.Range(-strength, strength),
+                    Random.Range(-strength, strength),
+                    0
+                );
+
+            transform.localPosition =
+                originalPosition + randomOffset;
+
+            yield return null;
+        }
+
+        transform.localPosition =
+            originalPosition;
     }
 }
 

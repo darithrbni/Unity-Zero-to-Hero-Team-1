@@ -37,4 +37,20 @@ public class PlayerHealth : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    public void Heal(int amount)
+    {
+        if (health >= 3)
+        {
+            return;
+        }
+
+        health += amount;
+
+        health = Mathf.Clamp(health, 0, 3);
+
+        healthUI.UpdateHealth(health);
+
+        Debug.Log("Player Heal: " + health);
+    }
 }
