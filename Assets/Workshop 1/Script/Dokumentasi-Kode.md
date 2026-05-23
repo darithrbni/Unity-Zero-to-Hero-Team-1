@@ -981,7 +981,7 @@ public class PickupFlash : MonoBehaviour
     private Light pointLight;
 
     [SerializeField]
-    private float flashIntensity = 400f;
+    private float flashIntensity = 100f;
 
     [SerializeField]
     private float flashDuration = 0.5f;
