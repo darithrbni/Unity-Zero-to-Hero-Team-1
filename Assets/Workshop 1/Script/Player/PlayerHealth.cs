@@ -15,6 +15,9 @@ public class PlayerHealth : MonoBehaviour
     private PickupFlash pickupFlash;
 
     [SerializeField]
+    private PickupGlowEffect pickupGlowEffect;
+
+    [SerializeField]
     private float invincibleDuration = 3f;
 
     private bool isInvincible = false;
@@ -58,7 +61,7 @@ public class PlayerHealth : MonoBehaviour
 
     public void Heal(int amount)
     {
-        pickupFlash.Flash();
+        pickupGlowEffect.PlayEffect();
 
         if (health >= 3)
         {
